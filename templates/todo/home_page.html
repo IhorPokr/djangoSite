@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+  <h1>
+    TODO list
+    <a href="{% url 'catalog:task-create' %}" class="btn btn-primary link-to-page">
+      Add task
+    </a>
+  </h1>
+
+  {% for task in task_list %}
+    <hr>
+    <h5>
+      <strong>{{ task.content }}</strong>
+      {% if task.is_completed %}
+        <span style="color: green">Done</span>
+        <form method="post" action="{% url 'catalog:toggle-task-assign' pk=task.id %}">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-secondary link-to-page">
+            Undo
+          </button>
+        </form>
+      {% else %}
+        <span style="color: red">Not done</span>
+        <form method="post" action="{% url 'catalog:toggle-task-assign' pk=task.id %}">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-success link-to-page">
+            Complete
+          </button>
+        </form>
+      {% endif %}
+    </h5>
+    <p>
+    {% if task.is_completed %}
+      Created: {{ task.created }}
+    {% else %}
+      Created: {{ task.created }},
+      <span style="color: red">Deadline: {{ task.deadline }}</span>
+    {% endif %}
+    </p>
+    <p>
+      Tags:
+      {% for tag in task.tags.all %}
+         {{ tag.name }}
+      {% endfor %}
+      <a href="{% url 'catalog:task-update' pk=task.id %}" class="text">
+        Update
+      </a>
+      <a href="{% url 'catalog:task-delete' pk=task.id %}" class="text">
+        Delete
+      </a>
+    </p>
+
+  {% empty %}
+    <p>No tasks!</p>
+  {% endfor %}
+
+{% endblock %}
