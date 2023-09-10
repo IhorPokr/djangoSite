@@ -3,10 +3,17 @@ from todo_list.models import Task, Tag
 
 
 class TaskForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(TaskForm, self).__init__(*args, **kwargs)
+        # Check if there are any tags in the database, if not, display a message.
+        if not Tag.objects.exists():
+            self.fields['tags'].queryset = Tag.objects.none()
+            self.fields['tags'].help_text = 'No tags available. Please create a tag first.'
+
     tags = forms.ModelMultipleChoiceField(
         queryset=Tag.objects.all(),
         widget=forms.CheckboxSelectMultiple,
-        required=True,  # Make this field required
+        required=True,
         error_messages={'required': 'Please select at least one tag.'}
     )
 
